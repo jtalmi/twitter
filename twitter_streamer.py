@@ -28,10 +28,14 @@ class StreamListener(tweepy.StreamListener):
             json_data['text_lower'] = json_data['text'].lower()
             json_data['created_at_dt'] = datetime.strptime(json_data['created_at'], '%a %b %d %H:%M:%S +0000 %Y')
             json_data['timestamp'] = datetime.now()
-            json_data['bank'] = categorize_tweet(json_data['text_lower'])
+
+            try:
+                json_data['bank'] = categorize_tweet(json_data['retweeted_status']['extended_tweet']['full_text'] + '\s' + json_data['text_lower'])
+            except:
+                json_data['bank'] = categorize_tweet(json_data['text_lower'])
 
             print '%s %s %s' % (json_data['user']['screen_name'], json_data['created_at'], json_data['bank'])
-            
+
             es.index(index="twitter",
                       doc_type="tweet",
                       body=json_data,
@@ -58,7 +62,7 @@ def categorize_tweet(tweet):
     categories = []
     for bank, keywords in banks.iteritems():
         for pattern in keywords:
-            if bool(re.search(pattern, tweet)):
+            if bool(re.search(pattern, tweet, re.I)):
                 categories.append(bank)
     return categories
 
