@@ -61,7 +61,6 @@ class StreamListener(tweepy.StreamListener):
 def categorize_tweet(tweet):
     categories = []
     for bank, keywords in banks.iteritems():
-        print bank
         for pattern in keywords:
             print pattern
             if bool(re.search(pattern, tweet)):
