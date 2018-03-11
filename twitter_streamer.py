@@ -25,11 +25,12 @@ class StreamListener(tweepy.StreamListener):
     def on_status(self, status):
         try:
             json_data = json.loads(status)
-            print 'n%s %s' % (json_data['user']['screen_name'], json_data['created_at'])
             json_data['text_lower'] = json_data['text'].lower()
             json_data['created_at_dt'] = datetime.strptime(json_data['created_at'], '%a %b %d %H:%M:%S +0000 %Y')
             json_data['timestamp'] = datetime.now()
             json_data['bank'] = categorize_tweet(json_data['text_lower'])
+
+            print '%s %s %s' % (json_data['user']['screen_name'], json_data['created_at'], json_data['bank'])
 
             for bank in [aus, boc, ecb, boe, fed, boj]:
                 for keyword in keywords:
