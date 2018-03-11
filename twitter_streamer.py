@@ -62,9 +62,7 @@ def categorize_tweet(tweet):
     categories = []
     for bank, keywords in banks.iteritems():
         for pattern in keywords:
-            print pattern
             if bool(re.search(pattern, tweet)):
-                print 'yes'
                 categories.append(bank)
     return categories
 
