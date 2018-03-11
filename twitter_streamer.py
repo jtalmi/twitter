@@ -30,7 +30,7 @@ class StreamListener(tweepy.StreamListener):
             json_data['timestamp'] = datetime.now()
 
             try:
-                json_data['bank'] = categorize_tweet(json_data['retweeted_status']['extended_tweet']['full_text'] + '\s' + json_data['text_lower'])
+                json_data['bank'] = categorize_tweet(json_data['retweeted_status']['extended_tweet']['full_text'].lower() + '\s' + json_data['text_lower'])
             except:
                 json_data['bank'] = categorize_tweet(json_data['text_lower'])
 
@@ -62,7 +62,7 @@ def categorize_tweet(tweet):
     categories = []
     for bank, keywords in banks.iteritems():
         for pattern in keywords:
-            if bool(re.search(pattern, tweet, re.I)):
+            if bool(re.search(pattern, tweet)):
                 categories.append(bank)
     return categories
 
