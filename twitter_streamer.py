@@ -32,7 +32,10 @@ class StreamListener(tweepy.StreamListener):
             try:
                 json_data['bank'] = categorize_tweet(json_data['retweeted_status']['extended_tweet']['full_text'].lower() + '\s' + json_data['text_lower'])
             except:
-                json_data['bank'] = categorize_tweet(json_data['text_lower'])
+                try:
+                    json_data['bank'] = categorize_tweet(json_data['quoted_status']['text'].lower() + '\s' + json_data['text_lower'])
+                except:
+                    json_data['bank'] = categorize_tweet(json_data['text_lower'])
 
             print '%s %s %s' % (json_data['user']['screen_name'], json_data['created_at'], json_data['bank'])
 
@@ -95,11 +98,11 @@ if __name__ == '__main__':
 
 
     banks = {}
-    banks['aus'] = ['reserve\s?bank', 'glenn\s?stevens', 'graeme\s?wheeler', 'philip\s?lowe', 'phillip\s?lowe']
-    banks['boc'] = ['bank\s?of\s?canada', 'poloz', re.compile('^(?=.*boc)(?=.*(inflation|rate|monetary|financial)).*$')]
+    banks['aus'] = [re.compile('^(?=.*reserve)(?=.*bank).*$'), re.compile('^(?=.*glenn)(?=.*stevens).*$'), re.compile('^(?=.*graeme)(?=.*wheeler).*$'), re.compile('^(?=.*philip)(?=.*lowe).*$'), re.compile('^(?=.*phillip)(?=.*lowe).*$')]
+    banks['boc'] = [re.compile('^(?=.*bank)(?=.*of)(?=.*canada).*$'), 'poloz', re.compile('^(?=.*boc)(?=.*(inflation|rate|monetary|financial)).*$')]
     banks['ecb'] = ['ecb', 'draghi', re.compile('^(?=.*european)(?=.*central)(?=.*bank).*$')]
     banks['boe'] = [re.compile('^(?=.*bank)(?=.*of)(?=.*england).*$'), re.compile('^(?=.*mark)(?=.*carney).*$'), re.compile('^(?=.*boe)(?=.*(inflation|rate|monetary|financial)).*$')]
-    banks['fed'] = ['fed', 'federal\s?reserve', 'fomc', 'yellen', 'powell']
+    banks['fed'] = ['fed', re.compile('^(?=.*federal)(?=.*reserve).*$'), 'fomc', 'yellen', 'powell']
     banks['boj'] = [re.compile('^(?=.*bank)(?=.*of)(?=.*japan).*$'), 'kuroda', re.compile('^(?=.*boj)(?=.*(inflation|rate|monetary|financial)).*$')]
 
     es = Elasticsearch()
