@@ -1,11 +1,12 @@
-import tweepy
 import sys
 import json
+import re
 import logging
-from textwrap import TextWrapper
-
 from datetime import datetime
+
 from elasticsearch import Elasticsearch
+from textwrap import TextWrapper
+import tweepy
 
 class StreamListener(tweepy.StreamListener):
     status_wrapper = TextWrapper(width=60, initial_indent='    ', subsequent_indent='    ')
@@ -28,6 +29,13 @@ class StreamListener(tweepy.StreamListener):
             json_data['text_lower'] = json_data['text'].lower()
             json_data['created_at_dt'] = datetime.strptime(json_data['created_at'], '%a %b %d %H:%M:%S +0000 %Y')
             json_data['timestamp'] = datetime.now()
+            json_data['bank'] = categorize_tweet(json_data['text_lower'])
+
+            for bank in [aus, boc, ecb, boe, fed, boj]:
+                for keyword in keywords:
+                    if bool(re.match(pattern,json_data['text_lower'])):
+                        json_data.append([k for k,v in locals().iteritems() if v is bank][0])
+
             es.index(index="twitter",
                       doc_type="tweet",
                       body=json_data,
@@ -49,6 +57,17 @@ class StreamListener(tweepy.StreamListener):
         sys.stderr.write(str(datetime.datetime.now()) + ": Timeout, sleeping for 60 seconds...\n")
         time.sleep( 60 )
         return False
+
+def categorize_tweet(tweet):
+    categories = []
+    for bank, keywords in banks.iteritems():
+        print bank
+        for pattern in keywords:
+            print pattern
+            if bool(re.search(pattern, tweet)):
+                print 'yes'
+                categories.append(bank)
+    return categories
 
 def initialize_streamer(client, auth, terms):
     #create_twitter_index(client, 'twitter')
@@ -76,6 +95,15 @@ if __name__ == '__main__':
                 'bank of england', 'mark carney', 'boe rate', 'boe inflation', 'boe monetary', 'boe financial',
                 'fed', 'federal reserve', 'FOMC', 'yellen', 'powell',
                 'bank of japan', 'kuroda', 'boj rate', 'boj inflation', 'boj monetary', 'boj financial']
+
+
+    banks = {}
+    banks['aus'] = ['reserve\s?bank', 'glenn\s?stevens', 'graeme\s?wheeler', 'philip\s?lowe', 'phillip\s?lowe']
+    banks['boc'] = ['bank\s?of\s?canada', 'poloz', re.compile('^(?=.*boc)(?=.*(inflation|rate|monetary|financial)).*$')]
+    banks['ecb'] = ['ecb', 'draghi', re.compile('^(?=.*european)(?=.*central)(?=.*bank).*$')]
+    banks['boe'] = [re.compile('^(?=.*bank)(?=.*of)(?=.*england).*$'), re.compile('^(?=.*mark)(?=.*carney).*$'), re.compile('^(?=.*boe)(?=.*(inflation|rate|monetary|financial)).*$')]
+    banks['fed'] = ['fed', 'federal\s?reserve', 'fomc', 'yellen', 'powell']
+    banks['boj'] = [re.compile('^(?=.*bank)(?=.*of)(?=.*japan).*$'), 'kuroda', re.compile('^(?=.*boj)(?=.*(inflation|rate|monetary|financial)).*$')]
 
     es = Elasticsearch()
     initialize_streamer(es, auth, terms)
