@@ -25,7 +25,7 @@ class StreamListener(tweepy.StreamListener):
     def on_status(self, status):
         try:
             json_data = json.loads(status)
-            json_data['text_lower'] = json_data['extended_tweet']['full_text'].lower()
+            json_data['text_lower'] = json_data['text'].lower()
             json_data['created_at_dt'] = datetime.strptime(json_data['created_at'], '%a %b %d %H:%M:%S +0000 %Y')
             json_data['timestamp'] = datetime.now()
 
@@ -36,7 +36,7 @@ class StreamListener(tweepy.StreamListener):
                     json_data['bank'] = categorize_tweet(json_data['quoted_status']['text'].lower() + '\s' + json_data['text_lower'])
                 except:
                     try:
-                        json_data['bank'] = categorize_tweet(json_data['extended_tweet']['full_text'])
+                        json_data['bank'] = categorize_tweet(json_data['extended_tweet']['full_text'].lower())
                     except:
                         json_data['bank'] = categorize_tweet(json_data['text_lower'])
 
