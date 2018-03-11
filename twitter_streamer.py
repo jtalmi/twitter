@@ -26,8 +26,6 @@ class StreamListener(tweepy.StreamListener):
         try:
             json_data = json.loads(status)
             json_data['text_lower'] = json_data['text'].lower()
-            json_data['created_at_dt'] = datetime.strptime(json_data['created_at'], '%a %b %d %H:%M:%S +0000 %Y')
-            json_data['timestamp'] = datetime.now()
 
             try:
                 json_data['bank'] = categorize_tweet(json_data['retweeted_status']['extended_tweet']['full_text'].lower() + '\s' + json_data['text_lower'])
@@ -44,9 +42,9 @@ class StreamListener(tweepy.StreamListener):
 
             es.index(index="twitter",
                       doc_type="tweet",
-                      body=json_data,
-                      ignore=400
-                     )
+                      body=json_data
+                     #ignore=400
+			)
         except Exception, e:
             print e
             pass
