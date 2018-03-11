@@ -1,3 +1,4 @@
-mongodb-osx-x86_64-3.4.5/
+streamer_v1.py
 .DS_Store
 *.pyc
+/old
