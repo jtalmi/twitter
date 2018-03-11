@@ -31,12 +31,7 @@ class StreamListener(tweepy.StreamListener):
             json_data['bank'] = categorize_tweet(json_data['text_lower'])
 
             print '%s %s %s' % (json_data['user']['screen_name'], json_data['created_at'], json_data['bank'])
-
-            for bank in [aus, boc, ecb, boe, fed, boj]:
-                for keyword in keywords:
-                    if bool(re.match(pattern,json_data['text_lower'])):
-                        json_data.append([k for k,v in locals().iteritems() if v is bank][0])
-
+            
             es.index(index="twitter",
                       doc_type="tweet",
                       body=json_data,
