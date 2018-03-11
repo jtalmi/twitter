@@ -33,7 +33,7 @@ class StreamListener(tweepy.StreamListener):
                 json_data['bank'] = categorize_tweet(json_data['retweeted_status']['extended_tweet']['full_text'].lower() + '\s' + json_data['text_lower'])
             except:
                 try:
-                    json_data['bank'] = categorize_tweet(json_data['quoted_status']['text'].lower() + '\s' + json_data['text_lower'])
+                    json_data['bank'] = categorize_tweet(json_data['quoted_status']['extended_tweet']['full_text'].lower() + '\s' + json_data['text_lower'])
                 except:
                     try:
                         json_data['bank'] = categorize_tweet(json_data['extended_tweet']['full_text'].lower())
