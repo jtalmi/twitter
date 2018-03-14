@@ -8,7 +8,7 @@ from elasticsearch import Elasticsearch
 from textwrap import TextWrapper
 import tweepy
 
-from twitter_index_setup import categorize_tweet, terms, banks
+from twitter_streamer_utils import categorize_tweet, terms, banks
 from credentials import credentials
 
 consumer_key = credentials['consumer_key']
@@ -78,5 +78,5 @@ if __name__ == '__main__':
     tracer.setLevel(logging.INFO)
     tracer.addHandler(logging.FileHandler('/tmp/es_trace.log'))
 
-    es = Elasticsearch()
+    es = Elasticsearch(http_auth=(username, password))
     initialize_streamer(es, auth, terms)
