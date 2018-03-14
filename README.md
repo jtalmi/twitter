@@ -6,26 +6,14 @@ The `twitter` index has a mapping that designates any field ending in 'created_a
 
 ## Keywords
 
-1. NZ and AUS reserve banks:
+1. __NZ and AUS reserve banks__: 'reserve bank', 'glenn stevens', 'graeme wheeler', 'philip lowe', 'phillip lowe'
 
-  * 'reserve bank', 'glenn stevens', 'graeme wheeler', 'philip lowe', 'phillip lowe'
+2. __Bank of Canada__: 'bank of canada', 'poloz', 'boc rate', 'boc inflation', 'boc monetary', 'boc financial'
 
-2. Bank of Canada:
+3. __European Central Bank__: 'ecb', 'draghi', 'european central bank'
 
-  * 'bank of canada', 'poloz', 'boc rate', 'boc inflation', 'boc monetary', 'boc financial'
+4. __Bank of England__: 'bank of england', 'mark carney', 'boe rate', 'boe inflation', 'boe monetary', 'boe financial'
 
-3. European Central Bank:
+5. __Federal Reserve__: 'fed', 'fomc', 'yellen', 'powell'
 
-  * 'ecb', 'draghi', 'european central bank'
-
-4. Bank of England:
-
-  * 'bank of england', 'mark carney', 'boe rate', 'boe inflation', 'boe monetary', 'boe financial'
-
-5. Federal Reserve:
-
-  * 'fed', 'federal reserve', 'FOMC', 'yellen', 'powell'
-
-6. Bank of Japan:
-
-  * 'bank of japan', 'kuroda', 'boj rate', 'boj inflation', 'boj monetary', 'boj financial'
+6. __Bank of Japan__: 'bank of japan', 'kuroda', 'boj rate', 'boj inflation', 'boj monetary', 'boj financial'
