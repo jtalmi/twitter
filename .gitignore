@@ -4,3 +4,4 @@ streamer_v1.py
 *.pyc
 /old
 scratch.py
+credentials.py

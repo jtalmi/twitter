@@ -9,12 +9,16 @@ from textwrap import TextWrapper
 import tweepy
 
 from twitter_index_setup import categorize_tweet, terms, banks
+from credentials import credentials
 
-consumer_key="YAYQVfgLhNKhfCBQgOUmWXHMI"
-consumer_secret="xR0VcKGaKSXlaA2EgAiItA6tY2XrxDJ503ucPXhNnRwfLa7bNW"
+consumer_key = credentials['consumer_key']
+consumer_secret = credentials["consumer_secret"]
 
-access_token="969664006247124992-rx6K00UGpg29O253ExsmftwJpys57yC"
-access_token_secret="jbZx5lrZSF701L7lwPNqTw3OM5ggFsxDtOWq99k8GCdCI"
+access_token = credentials["acces_token"]
+access_token_secret = credentials["access_token_secret"]
+
+username = credentials['username']
+password = credentials['password']
 
 auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_token_secret)
