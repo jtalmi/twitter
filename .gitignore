@@ -3,3 +3,4 @@ streamer_v1.py
 .DS_Store
 *.pyc
 /old
+scratch.py
