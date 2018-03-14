@@ -14,7 +14,7 @@ from credentials import credentials
 consumer_key = credentials['consumer_key']
 consumer_secret = credentials["consumer_secret"]
 
-access_token = credentials["acces_token"]
+access_token = credentials["access_token"]
 access_token_secret = credentials["access_token_secret"]
 
 username = credentials['username']
@@ -56,15 +56,15 @@ class StreamListener(tweepy.StreamListener):
             pass
 
     def on_limit(self, track):
-        sys.stderr.write("\n" + str(datetime.datetime.now()) + ": We missed " + str(track) + " tweets" + "\n")
+        sys.stderr.write("\n" + str(datetime.now()) + ": We missed " + str(track) + " tweets" + "\n")
         return True
 
     def on_error(self, status_code):
-        sys.stderr.write(str(datetime.datetime.now()) + ': Error: ' + str(status_code) + "\n")
+        sys.stderr.write(str(datetime.now()) + ': Error: ' + str(status_code) + "\n")
         return False
 
     def on_timeout(self):
-        sys.stderr.write(str(datetime.datetime.now()) + ": Timeout, sleeping for 60 seconds...\n")
+        sys.stderr.write(str(datetime.now()) + ": Timeout, sleeping for 60 seconds...\n")
         time.sleep( 60 )
         return False
 
