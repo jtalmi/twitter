@@ -5,3 +5,4 @@ streamer_v1.py
 /old
 scratch.py
 credentials.py
+sendgrid.env

@@ -2,7 +2,7 @@ from datetime import datetime
 from elasticsearch.exceptions import TransportError
 import re
 
-terms = ['reserve bank', 'glenn stevens', 'graeme wheeler', 'philip lowe', 'phillip lowe',
+terms = ['reserve bank', 'glenn stevens', 'graeme wheeler', 'philip lowe', 'phillip lowe', 'adrian orr',
             'bank of canada', 'poloz', 'boc rate', 'boc inflation', 'boc monetary', 'boc financial',
             'ecb', 'draghi', 'european central bank',
             'bank of england', 'mark carney', 'boe rate', 'boe inflation', 'boe monetary', 'boe financial',
