@@ -2,7 +2,13 @@ import sys
 import json
 import re
 import logging
+import smtplib
+from email.mime.text import MIMEText
 from datetime import datetime
+
+import sendgrid
+import os
+from sendgrid.helpers.mail import *
 
 from elasticsearch import Elasticsearch
 from textwrap import TextWrapper
@@ -11,6 +17,7 @@ import tweepy
 from twitter_streamer_utils import categorize_tweet, terms, banks
 from credentials import credentials
 
+# Fetch twitter credentials
 consumer_key = credentials['consumer_key']
 consumer_secret = credentials["consumer_secret"]
 
@@ -20,6 +27,7 @@ access_token_secret = credentials["access_token_secret"]
 username = credentials['username']
 password = credentials['password']
 
+# Authenticate
 auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_token_secret)
 
@@ -57,19 +65,24 @@ class StreamListener(tweepy.StreamListener):
 
     def on_limit(self, track):
         sys.stderr.write("\n" + str(datetime.now()) + ": We missed " + str(track) + " tweets" + "\n")
-        return True
+        
+	return True
 
     def on_error(self, status_code):
         sys.stderr.write(str(datetime.now()) + ': Error: ' + str(status_code) + "\n")
-        return False
+	return False
 
     def on_timeout(self):
         sys.stderr.write(str(datetime.now()) + ": Timeout, sleeping for 60 seconds...\n")
-        time.sleep( 60 )
-        return False
+        return TimeoutException
+
+def send_mail(from=donotreply@cb_tweets.com, to=jtalmi@gmail.com, subject, content=""):
+    sg = sendgrid.SendGridAPIClient(apikey=os.environ.get('SENDGRID_API_KEY'))
+    mail = Mail(from, subject, to, content)
+    response = sg.client.mail.send.post(request_body=mail.get())
 
 def initialize_streamer(client, auth, terms):
-    streamer = tweepy.Stream(auth=auth, listener=StreamListener(), timeout=3000000000 )
+    streamer = tweepy.Stream(auth=auth, listener=StreamListener(), timeout=60)
     streamer.filter(None, terms, languages=['en'])
 
 if __name__ == '__main__':
@@ -79,4 +92,31 @@ if __name__ == '__main__':
     tracer.addHandler(logging.FileHandler('/tmp/es_trace.log'))
 
     es = Elasticsearch(http_auth=(username, password))
-    initialize_streamer(es, auth, terms)
+    
+    while True:
+    	try:
+	    	initialize_streamer(es, auth, terms)
+		except KeyboardInterrupt:
+	    	#User pressed ctrl+c or cmd+c -- get ready to exit the program
+			print("%s - KeyboardInterrupt caught. Closing stream and exiting."%datetime.now())
+			stream.disconnect()
+			break
+		except TimeoutException:
+			#Timeout error, network problems? reconnect.
+			print("%s - Timeout exception caught. Closing stream and reopening."%datetime.now())
+			try:
+				stream.disconnect()
+			except:
+				pass
+			continue
+		except Exception as e:
+			#Anything else
+			try:
+				info = str(e)
+				sys.stderr.write("%s - Unexpected exception. %s\n"%(datetime.now(),info))
+				content = "Unexpected error in Twitter collector. Check server. %s" % info
+				subject = "Unexpected error in Twitter collector"
+				send_mail(subject=subject, content=content)
+			except:
+				pass
+			time.sleep(60)#Sleep thirty minutes and resume
