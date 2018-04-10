@@ -76,9 +76,9 @@ class StreamListener(tweepy.StreamListener):
         sys.stderr.write(str(datetime.now()) + ": Timeout, sleeping for 60 seconds...\n")
         return TimeoutException
 
-def send_mail(from=donotreply@cb_tweets.com, to=jtalmi@gmail.com, subject, content=""):
+def send_mail(sender="donotreply@cb_tweets.com", to="jtalmi@gmail.com", subject="Twitter streaming error", content=""):
     sg = sendgrid.SendGridAPIClient(apikey=os.environ.get('SENDGRID_API_KEY'))
-    mail = Mail(from, subject, to, content)
+    mail = Mail(sender, subject, to, content)
     response = sg.client.mail.send.post(request_body=mail.get())
 
 def initialize_streamer(client, auth, terms):
@@ -96,27 +96,27 @@ if __name__ == '__main__':
     while True:
     	try:
 	    	initialize_streamer(es, auth, terms)
-		except KeyboardInterrupt:
+	except KeyboardInterrupt:
 	    	#User pressed ctrl+c or cmd+c -- get ready to exit the program
-			print("%s - KeyboardInterrupt caught. Closing stream and exiting."%datetime.now())
+		print("%s - KeyboardInterrupt caught. Closing stream and exiting."%datetime.now())
+		stream.disconnect()
+		break
+	except TimeoutException:
+		#Timeout error, network problems? reconnect.
+		print("%s - Timeout exception caught. Closing stream and reopening."%datetime.now())
+		try:
 			stream.disconnect()
-			break
-		except TimeoutException:
-			#Timeout error, network problems? reconnect.
-			print("%s - Timeout exception caught. Closing stream and reopening."%datetime.now())
-			try:
-				stream.disconnect()
-			except:
-				pass
-			continue
-		except Exception as e:
-			#Anything else
-			try:
-				info = str(e)
-				sys.stderr.write("%s - Unexpected exception. %s\n"%(datetime.now(),info))
-				content = "Unexpected error in Twitter collector. Check server. %s" % info
-				subject = "Unexpected error in Twitter collector"
-				send_mail(subject=subject, content=content)
-			except:
-				pass
-			time.sleep(60)#Sleep thirty minutes and resume
+		except:
+			pass
+		continue
+	except Exception as e:
+		#Anything else
+		try:
+			info = str(e)
+			sys.stderr.write("%s - Unexpected exception. %s\n"%(datetime.now(),info))
+			content = "Unexpected error in Twitter collector. Check server. %s" % info
+			subject = "Unexpected error in Twitter collector"
+			send_mail(subject=subject, content=content)
+		except:
+			pass
+		time.sleep(60)#Sleep thirty minutes and resume
