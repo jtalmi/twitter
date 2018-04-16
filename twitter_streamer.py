@@ -52,9 +52,9 @@ class StreamListener(tweepy.StreamListener):
 			else:
 				json_data['text_lower'] = json_data['text'].lower()
 			json_data['timestamp'] = datetime.now()
-			json_data['bank'] = categorize_tweet(defaultdict(str, json_data.copy()), banks)
+			json_data['bank'] = categorize_tweet(json_data, banks)
 			#print categorize_tweet(defaultdict(str, json_data), banks)
-			print '%s %s' % (json_data['user']['screen_name'], json_data['created_at'])
+			print '%s %s %s' % (json_data['user']['screen_name'], json_data['created_at'], json_data['bank'])
 
 			es.index(index="twitter",
                       doc_type="tweet",
