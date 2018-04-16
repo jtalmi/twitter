@@ -71,20 +71,21 @@ def categorize_tweet(tweet, banks):
     """
     categories = []
     text = ""
-    if tweet['retweeted_status']:
-        if tweet['retweeted_status']['extended_tweet']:
-            text += tweet['retweeted_status']['extended_tweet']['full_text'] + '\s'
-        else:
-            text += tweet['retweeted_status']['text'] + '\s'
-    if tweet['is_quote_status']:
-        if tweet['quoted_status']['extended_tweet']:
-            text += tweet['quoted_status']['extended_tweet']['full_text'] + '\s'
-        else:
-            text += tweet['quoted_status']['text'] + '\s'
-    if tweet['extended_tweet']:
-        text += tweet['extended_tweet']['full_text'] + '\s'
+    if 'retweeted_status' in tweet.keys():
+        try:
+            text += tweet['retweeted_status']['extended_tweet']['full_text']
+        except:
+            text += tweet['retweeted_status']['text']
+    if 'quoted_status' in tweet.keys():
+        try:
+            text += tweet['quoted_status']['extended_tweet']['full_text']
+        except:
+            text += tweet['quoted_status']['text']
+    if tweet['truncated']:
+        text += tweet['extended_tweet']['full_text']
     else:
-        text += tweet['text'] + '\s'
+        text += tweet['text']
+
     text = text.lower()
 
     for bank, keywords in banks.iteritems():
