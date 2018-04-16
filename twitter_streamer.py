@@ -67,11 +67,11 @@ class StreamListener(tweepy.StreamListener):
 
     def on_limit(self, track):
         sys.stderr.write("\n" + str(datetime.now()) + ": We missed " + str(track) + " tweets" + "\n")
-		return True
+        return True
 
     def on_error(self, status_code):
         sys.stderr.write(str(datetime.now()) + ': Error: ' + str(status_code) + "\n")
-		return False
+        return False
 
     def on_timeout(self):
         sys.stderr.write(str(datetime.now()) + ": Timeout, sleeping for 60 seconds...\n")
