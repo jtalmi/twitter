@@ -107,14 +107,14 @@ if __name__ == '__main__':
             except:
                 pass
             continue
-    except Exception as e:
-		#Anything else
-		try:
-			info = str(e)
-			sys.stderr.write("%s - Unexpected exception. %s\n"%(datetime.now(),info))
-			content = "Unexpected error in Twitter collector. Check server. %s" % info
-			subject = "Unexpected error in Twitter collector"
-			send_mail(subject=subject, content=content)
-		except:
-			pass
-		time.sleep(60)#Sleep thirty minutes and resume
+        except Exception as e:
+            #Anything else
+            try:
+                info = str(e)
+                sys.stderr.write("%s - Unexpected exception. %s\n"%(datetime.now(),info))
+                content = "Unexpected error in Twitter collector. Check server. %s" % info
+                subject = "Unexpected error in Twitter collector"
+                send_mail(subject=subject, content=content)
+            except:
+                pass
+            time.sleep(60)#Sleep thirty minutes and resume
