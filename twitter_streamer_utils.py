@@ -82,13 +82,14 @@ def categorize_tweet(tweet, banks):
         else:
             text += tweet['quoted_status']['text'] + '\s'
     if tweet['extended_tweet']:
-        text += tweet['extended_tweet'] + '\s'
+        text += tweet['extended_tweet']['full_text'] + '\s'
     else:
         text += tweet['text'] + '\s'
+    text = text.lower()
 
     for bank, keywords in banks.iteritems():
         for pattern in keywords:
-            if bool(re.search(pattern, text, re.IGNORECASE)):
+            if bool(re.search(pattern, text)):
                 categories.append(bank)
                 continue
 
