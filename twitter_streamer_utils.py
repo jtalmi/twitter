@@ -9,7 +9,7 @@ terms = ['reserve bank', 'glenn stevens', 'graeme wheeler', 'philip lowe', 'phil
         'fed', 'federal reserve', 'FOMC', 'yellen', 'powell',
         'bank of japan', 'kuroda', 'boj rate', 'boj inflation', 'boj monetary', 'boj financial']
 
-groups = {'aus', 'boc', 'ecb', 'boe', 'fed', 'boj'}
+groups = {}
 groups['aus'] = ['reserve bank', 'glenn stevens', 'graeme wheeler', 'philip lowe', 'phillip lowe', 'adrian orr']
 groups['boc'] = ['bank of canada', 'poloz', 'boc rate', 'boc inflation', 'boc monetary', 'boc financial']
 groups['ecb'] = ['ecb', 'draghi', 'european central bank']
