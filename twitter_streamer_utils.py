@@ -77,7 +77,7 @@ def categorize_tweet(tweet, banks):
         else:
             text += tweet['retweeted_status']['text'] + '\s'
     if tweet['is_quote_status']:
-        if tweet['quoted_status']['extended_tweet']['full_text']:
+        if tweet['quoted_status']['extended_tweet']:
             text += tweet['quoted_status']['extended_tweet']['full_text'] + '\s'
         else:
             text += tweet['quoted_status']['text'] + '\s'
