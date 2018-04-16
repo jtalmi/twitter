@@ -2,9 +2,8 @@ import sys
 import json
 import re
 import logging
-import smtplib
-from email.mime.text import MIMEText
 from datetime import datetime
+from collections import defaultdict
 
 import sendgrid
 import os
@@ -47,8 +46,11 @@ class StreamListener(tweepy.StreamListener):
 
     def on_status(self, status):
         try:
-            json_data = json.loads(status)
-            json_data['text_lower'] = json_data['text'].lower()
+            json_data = defaultdict(str, json.loads(status))
+            if json_data['truncated']:
+                json_data['text_lower'] = json_data['extended_tweet']['full_text'].lower()
+            else:
+                json_data['text_lower'] = json_data['text'].lower()
             json_data['timestamp'] = datetime.now()
             json_data['bank'] = categorize_tweet(json_data, banks)
 
@@ -65,7 +67,6 @@ class StreamListener(tweepy.StreamListener):
 
     def on_limit(self, track):
         sys.stderr.write("\n" + str(datetime.now()) + ": We missed " + str(track) + " tweets" + "\n")
-        
 	return True
 
     def on_error(self, status_code):
@@ -81,35 +82,32 @@ def send_mail(sender="donotreply@cb_tweets.com", to="jtalmi@gmail.com", subject=
     mail = Mail(sender, subject, to, content)
     response = sg.client.mail.send.post(request_body=mail.get())
 
-def initialize_streamer(client, auth, terms):
-    streamer = tweepy.Stream(auth=auth, listener=StreamListener(), timeout=60)
-    streamer.filter(None, terms, languages=['en'])
-
 if __name__ == '__main__':
     # get trace logger and set level
-    tracer = logging.getLogger('elasticsearch.trace')
-    tracer.setLevel(logging.INFO)
-    tracer.addHandler(logging.FileHandler('/tmp/es_trace.log'))
+    #tracer = logging.getLogger('elasticsearch.trace')
+    #tracer.setLevel(logging.INFO)
+    #tracer.addHandler(logging.FileHandler('/tmp/es_trace.log'))
 
     es = Elasticsearch(http_auth=(username, password))
-    
+
     while True:
-    	try:
-	    	initialize_streamer(es, auth, terms)
-	except KeyboardInterrupt:
-	    	#User pressed ctrl+c or cmd+c -- get ready to exit the program
-		print("%s - KeyboardInterrupt caught. Closing stream and exiting."%datetime.now())
-		stream.disconnect()
-		break
-	except TimeoutException:
-		#Timeout error, network problems? reconnect.
-		print("%s - Timeout exception caught. Closing stream and reopening."%datetime.now())
-		try:
-			stream.disconnect()
-		except:
-			pass
-		continue
-	except Exception as e:
+        try:
+            streamer = tweepy.Stream(auth=auth, listener=StreamListener(), timeout=60)
+            streamer.filter(None, terms, languages=['en'])
+        except KeyboardInterrupt:
+            #User pressed ctrl+c or cmd+c -- get ready to exit the program
+            print("%s - KeyboardInterrupt caught. Closing stream and exiting."%datetime.now())
+            stream.disconnect()
+            break
+        except TimeoutException:
+            #Timeout error, network problems? reconnect.
+            print("%s - Timeout exception caught. Closing stream and reopening."%datetime.now())
+            try:
+                stream.disconnect()
+            except:
+                pass
+            continue
+    except Exception as e:
 		#Anything else
 		try:
 			info = str(e)
