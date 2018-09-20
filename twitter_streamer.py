@@ -13,7 +13,7 @@ from elasticsearch import Elasticsearch
 from textwrap import TextWrapper
 import tweepy
 
-from twitter_streamer_utils import categorize_tweet, terms, banks
+from twitter_streamer_utils import create_twitter_index, categorize_tweet, terms, banks
 from credentials import credentials
 
 # Fetch twitter credentials
@@ -25,6 +25,9 @@ access_token_secret = credentials["access_token_secret"]
 
 username = credentials['username']
 password = credentials['password']
+
+# ES
+index_name = 'cb_twitter2'
 
 # Authenticate
 auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
@@ -44,7 +47,7 @@ class StreamListener(tweepy.StreamListener):
 			print warning['message']
 			logfile.write("%s - warning. %s\n" % (datetime.now(), warning['message']))
 			return False
-	
+
 	def on_status(self, status):
 		try:
 			json_data = json.loads(status)
@@ -54,10 +57,9 @@ class StreamListener(tweepy.StreamListener):
 				json_data['text_lower'] = json_data['text'].lower()
 			json_data['timestamp'] = datetime.now()
 			json_data['bank'] = categorize_tweet(json_data, banks)
-			#print categorize_tweet(defaultdict(str, json_data), banks)
 			print '%s %s %s' % (json_data['user']['screen_name'], json_data['created_at'], json_data['bank'])
-			
-			es.index(index="twitter",
+
+			es.index(index=index_name,
                       doc_type="tweet",
                       body=json_data
                      #ignore=400
@@ -70,7 +72,7 @@ class StreamListener(tweepy.StreamListener):
 		sys.stderr.write("\n" + str(datetime.now()) + ": We missed " + str(track) + " tweets" + "\n")
 		logfile.write("\n" + str(datetime.now()) + ": We missed " + str(track) + " tweets" + "\n")
 		return True
-	
+
 	def on_error(self, status_code):
 		sys.stderr.write(str(datetime.now()) + ': Error: ' + str(status_code) + "\n")
 		logfile(str(datetime.now()) + ': Error: ' + str(status_code) + "\n")
@@ -94,10 +96,12 @@ if __name__ == '__main__':
     #tracer = logging.getLogger('elasticsearch.trace')
     #tracer.setLevel(logging.INFO)
     #tracer.addHandler(logging.FileHandler('/tmp/es_trace.log'))
-	es = Elasticsearch(http_auth=(username, password))
-	logfile = open('tweet_error_log.txt', 'w+')
+    es = Elasticsearch(http_auth=(username, password))
+    logfile = open('tweet_error_log.txt', 'w+')
 
-	while True:
+    create_twitter_index(es, index='cb_twitter')
+
+    while True:
 		try:
 			streamer = tweepy.Stream(auth=auth, listener=StreamListener(), timeout=60)
 			streamer.filter(None, terms, languages=['en'])
@@ -119,7 +123,7 @@ if __name__ == '__main__':
 		except Exception as e:
 			#Anything else
 			try:
-				info = str(e)				
+				info = str(e)
 				sys.stderr.write("%s - Unexpected exception. %s\n" % (datetime.now(),info))
 				logfile.write("%s - Unexpected exception. %s\n" % (datetime.now(),info))
 				content = "Unexpected error in Twitter collector. Check server. %s" % info

@@ -27,12 +27,12 @@ banks['boj'] = [re.compile('^(?=.*bank)(?=.*of)(?=.*japan).*$'), 'kuroda', re.co
 
 
 
-def create_twitter_index(client, index='twitter'):
+def create_twitter_index(client, index='cb_twitter'):
     create_index_body = {
       'settings': {
         # just one shard, no replicas for testing
-        'number_of_shards': 1,
-        'number_of_replicas': 0,
+        'number_of_shards': 5,
+        'number_of_replicas': 1,
         'mappings': {
             'tweet': {
                 "dynamic_templates": [{

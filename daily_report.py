@@ -20,7 +20,7 @@ import base64
 from credentials import credentials
 from twitter_streamer_utils import banks
 
-def tweets_per_minute_query(client, index='twitter', as_of=(datetime.now() - timedelta(hours=24)), up_to=datetime.now(), bank=None):
+def tweets_per_minute_query(client, index='cb_twitter2', as_of=(datetime.now() - timedelta(hours=24)), up_to=datetime.now(), bank=None):
 	as_of = as_of.strftime("%a %b %d %H:%M:%S +0000 %Y")
 	up_to = up_to.strftime("%a %b %d %H:%M:%S +0000 %Y")
 	s = dsl.Search(using=client, index=index)
@@ -63,11 +63,11 @@ if __name__ == '__main__':
 	client = Elasticsearch(http_auth=(username, password))
 	api_key = os.environ.get('SENDGRID_API_KEY')
 	
-	df = tweets_per_minute_query(client, 'twitter')
+	df = tweets_per_minute_query(client, 'cb_twitter2')
 
 	for bank in banks.iterkeys():
 		print bank
-		df[bank] = tweets_per_minute_query(client, 'twitter', bank=bank)['count']
+		df[bank] = tweets_per_minute_query(client, 'cb_twitter2', bank=bank)['count']
 	
 	df = df.set_index('timestamp')
 	df = df.resample('3T').sum()
