@@ -69,7 +69,7 @@ class StreamListener(tweepy.StreamListener):
 			pass
 
 	def on_limit(self, track):
-		sys.stderr.write("\n" + str(datetime.now()) + ": We missed " + str(track) + " tweets" + "\n")
+	sys.stderr.write("\n" + str(datetime.now()) + ": We missed " + str(track) + " tweets" + "\n")
 		logfile.write("\n" + str(datetime.now()) + ": We missed " + str(track) + " tweets" + "\n")
 		return True
 
