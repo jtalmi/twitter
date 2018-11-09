@@ -99,7 +99,7 @@ if __name__ == '__main__':
     es = Elasticsearch(http_auth=(username, password))
     logfile = open('tweet_error_log.txt', 'w+')
 
-    create_twitter_index(es, index='cb_twitter')
+    #create_twitter_index(es, index='cb_twitter')
 
     while True:
 		try:
